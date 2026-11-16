@@ -27,7 +27,7 @@ Add these repository variables (not secrets):
 | Variable | Value |
 | --- | --- |
 | `FTP_PROTOCOL` | `ftps` (recommended), or `ftp` / `ftps-legacy` if your host requires it |
-| `FTP_SERVER_DIR` | Website directory relative to the FTP login. For this host use `public_html/pupecommerce/`; keep the trailing slash. The workflow uses that path if the variable is unset. |
+| `FTP_SERVER_DIR` | Not used. The FTP login already opens in `/public_html/pupecommerce`, so the workflow deploys to `./`. Remove any old `FTP_SERVER_DIR` repository variable. |
 
 Import `database.sql` into your hosted MySQL database with phpMyAdmin. For the PHP app's database credentials, choose one of these approaches:
 
