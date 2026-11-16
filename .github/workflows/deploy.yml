@@ -66,4 +66,5 @@ jobs:
             **/.git*/**
             **/.github/**
             **/.env*
+            **/connection.secret.php
             **/store.sqlite

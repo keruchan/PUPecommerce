@@ -7,7 +7,10 @@ try {
 } catch (Throwable $e) {
     error_log('Shop database connection failed: ' . $e->getMessage());
     http_response_code(500);
-    exit('The shop could not connect to its database. Check the settings in connection.php and confirm that you imported database.sql in phpMyAdmin.');
+    $dbErrorCode = $e instanceof PDOException && isset($e->errorInfo[1])
+        ? ' MySQL error code: ' . (int)$e->errorInfo[1] . '.'
+        : '';
+    exit('The shop could not connect to its database. Check that connection.secrets.php is beside index.php, or set the DB_* environment variables in your hosting panel, then verify the database host, name, username, password, and user permissions.' . $dbErrorCode);
 }
 
 $_SESSION['cart'] ??= [];

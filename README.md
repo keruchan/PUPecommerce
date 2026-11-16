@@ -39,7 +39,7 @@ Import `database.sql` into your hosted MySQL database with phpMyAdmin. For autom
 | `DB_PASSWORD` | Database password |
 | `DB_PORT` | Database port, usually `3306` (optional; defaults to `3306`) |
 
-The workflow writes these secrets into `connection.secrets.php` for deployment. That file is not stored in Git and `.htaccess` blocks direct web access. Alternatively, if you set the PHP environment variables directly in your hosting panel, leave all five `DB_*` GitHub secrets unset; the app reads environment variables at runtime.
+The workflow writes these secrets into `connection.secrets.php` for deployment. That file is not stored in Git and `.htaccess` blocks direct web access. The app also accepts a manually uploaded `connection.secret.php` (singular). Alternatively, if you set the PHP environment variables directly in your hosting panel, leave all five `DB_*` GitHub secrets unset; the app reads environment variables at runtime.
 
 For hosting-panel environment variables, use:
 

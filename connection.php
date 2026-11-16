@@ -3,15 +3,22 @@ declare(strict_types=1);
 
 /*
  * Production credentials can come from hosting environment variables or the
- * private, untracked connection.secrets.php file. Local XAMPP defaults apply
+ * private, untracked connection.secrets.php (or connection.secret.php) file.
+ * Local XAMPP defaults apply
  * only when APP_ENV is not "production" and no private config is present.
  */
 $privateConfig = [];
-$privateConfigFile = __DIR__ . '/connection.secrets.php';
-if (is_file($privateConfigFile)) {
+$privateConfigFile = null;
+foreach ([__DIR__ . '/connection.secrets.php', __DIR__ . '/connection.secret.php'] as $candidate) {
+    if (is_file($candidate)) {
+        $privateConfigFile = $candidate;
+        break;
+    }
+}
+if ($privateConfigFile !== null) {
     $loadedConfig = require $privateConfigFile;
     if (!is_array($loadedConfig)) {
-        throw new RuntimeException('connection.secrets.php must return an array.');
+        throw new RuntimeException('The private database config must return an array.');
     }
     $privateConfig = $loadedConfig;
 }
