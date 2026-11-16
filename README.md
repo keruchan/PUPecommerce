@@ -27,7 +27,7 @@ Add these repository variables (not secrets):
 | Variable | Value |
 | --- | --- |
 | `FTP_PROTOCOL` | `ftps` (recommended), or `ftp` / `ftps-legacy` if your host requires it |
-| `FTP_SERVER_DIR` | Website directory on the FTP server, often `/public_html/` |
+| `FTP_SERVER_DIR` | Website directory relative to the FTP login. Use `./` if the login already opens in the website root; use `public_html/` only if that folder is below the login directory. Leave unset to use `./`. |
 
 Import `database.sql` into your hosted MySQL database with phpMyAdmin. For the PHP app's database credentials, choose one of these approaches:
 
