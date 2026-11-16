@@ -1,0 +1,5 @@
+.env
+.env.*
+!.env.example
+store.sqlite
+.ftp-deploy-sync-state.json

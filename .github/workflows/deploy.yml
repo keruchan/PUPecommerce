@@ -1,0 +1,38 @@
+name: Deploy PHP site
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload site to hosting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Deploy over FTP or FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT || '21' }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: ./
+          server-dir: ${{ vars.FTP_SERVER_DIR || '/public_html/' }}
+          exclude: |
+            **/.git*/**
+            **/.github/**
+            **/.env*
+            **/store.sqlite
+            **/.ftp-deploy-sync-state.json
