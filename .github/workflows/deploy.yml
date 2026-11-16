@@ -20,6 +20,38 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Create private production database config
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+        run: |
+          python3 - <<'PY'
+          import base64
+          import json
+          import os
+          from pathlib import Path
+
+          keys = ['DB_HOST', 'DB_NAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_PORT']
+          supplied = {key: os.environ.get(key, '') for key in keys}
+          if not supplied['DB_PORT'] and any(supplied[key] for key in keys[:-1]):
+              supplied['DB_PORT'] = '3306'
+          missing = [key for key in keys if not supplied[key]]
+
+          if len(missing) == len(keys):
+              print('No DB_* GitHub secrets found; the host must provide DB_* environment variables.')
+          elif missing:
+              raise SystemExit('Set all DB_* GitHub secrets or none. Missing: ' + ', '.join(missing))
+          else:
+              config = {'APP_ENV': 'production', **supplied}
+              encoded = base64.b64encode(json.dumps(config).encode()).decode()
+              php = "<?php\ndeclare(strict_types=1);\nreturn json_decode(base64_decode('" + encoded + "'), true, 512, JSON_THROW_ON_ERROR);\n"
+              Path('connection.secrets.php').write_text(php, encoding='utf-8')
+              print('Created private production database config for deployment.')
+          PY
+
       - name: Deploy over FTP or FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -34,5 +66,4 @@ jobs:
             **/.git*/**
             **/.github/**
             **/.env*
-            **/connection.secrets.php
             **/store.sqlite

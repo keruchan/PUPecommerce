@@ -27,12 +27,21 @@ Add these repository variables (not secrets):
 | Variable | Value |
 | --- | --- |
 | `FTP_PROTOCOL` | `ftps` (recommended), or `ftp` / `ftps-legacy` if your host requires it |
-| `FTP_SERVER_DIR` | Not used. The FTP login already opens in `/public_html/pupecommerce`, so the workflow deploys to `./`. Remove any old `FTP_SERVER_DIR` repository variable. |
+| `FTP_SERVER_DIR` | Not used. The FTP login already opens in `/public_html/pupecommerce`, so the workflow deploys to `./`. |
 
-Import `database.sql` into your hosted MySQL database with phpMyAdmin. For the PHP app's database credentials, choose one of these approaches:
+Import `database.sql` into your hosted MySQL database with phpMyAdmin. For automatic deployments, add these database credentials as repository secrets too:
 
-1. **Hosting environment settings (recommended):** set the variables below for the PHP website in your hosting control panel.
-2. **Private config file:** copy `connection.secrets.example.php` to `connection.secrets.php`, fill in the same values, and upload that private file to the website directory using your host's file manager. The deployment workflow deliberately excludes `connection.secrets.php`; `.gitignore` also keeps it out of Git. The `.htaccess` rule denies direct web requests to it. If both environment variables and the private file are present, environment variables take priority.
+| Secret | Value |
+| --- | --- |
+| `DB_HOST` | Database host supplied by your provider |
+| `DB_NAME` | Database name |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+| `DB_PORT` | Database port, usually `3306` (optional; defaults to `3306`) |
+
+The workflow writes these secrets into `connection.secrets.php` for deployment. That file is not stored in Git and `.htaccess` blocks direct web access. Alternatively, if you set the PHP environment variables directly in your hosting panel, leave all five `DB_*` GitHub secrets unset; the app reads environment variables at runtime.
+
+For hosting-panel environment variables, use:
 
 | Variable | Value |
 | --- | --- |
