@@ -11,7 +11,7 @@ A responsive PHP storefront with a product catalog, session shopping bag, and de
 
 ## Deploy to hosting
 
-The GitHub Actions workflow deploys the repository root to your hosting account over FTPS on pushes to `master`. You can also run it from GitHub's **Actions** tab with **Run workflow**.
+The GitHub Actions workflow deploys the repository root to your hosting account over FTPS on pushes to `master`. It keeps its sync-state file on the server for incremental deploys; `.htaccess` blocks web access to that file. You can also run it from GitHub's **Actions** tab with **Run workflow**.
 
 In the repository's **Settings → Secrets and variables → Actions**, add these repository secrets:
 

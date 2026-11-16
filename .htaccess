@@ -2,3 +2,6 @@ Options -Indexes
 <FilesMatch "^(connection(\.secrets)?(\.example)?\.php|database\.sql|schema\.sql|store\.sqlite)$">
   Require all denied
 </FilesMatch>
+<Files ".ftp-deploy-sync-state.json">
+  Require all denied
+</Files>

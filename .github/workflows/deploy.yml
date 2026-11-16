@@ -36,4 +36,3 @@ jobs:
             **/.env*
             **/connection.secrets.php
             **/store.sqlite
-            **/.ftp-deploy-sync-state.json
