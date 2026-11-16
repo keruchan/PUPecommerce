@@ -1,5 +1,6 @@
 .env
 .env.*
 !.env.example
+/connection.secrets.php
 store.sqlite
 .ftp-deploy-sync-state.json

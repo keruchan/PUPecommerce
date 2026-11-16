@@ -29,10 +29,11 @@ jobs:
           port: ${{ secrets.PORT || '21' }}
           protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
           local-dir: ./
-          server-dir: ${{ vars.FTP_SERVER_DIR || '/public_html/' }}
+          server-dir: ${{ vars.FTP_SERVER_DIR || '' }}
           exclude: |
             **/.git*/**
             **/.github/**
             **/.env*
+            **/connection.secrets.php
             **/store.sqlite
             **/.ftp-deploy-sync-state.json

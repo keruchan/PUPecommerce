@@ -29,7 +29,10 @@ Add these repository variables (not secrets):
 | `FTP_PROTOCOL` | `ftps` (recommended), or `ftp` / `ftps-legacy` if your host requires it |
 | `FTP_SERVER_DIR` | Website directory on the FTP server, often `/public_html/` |
 
-Import `database.sql` into your hosted MySQL database with phpMyAdmin. Separately, set these environment variables for the **PHP website in your hosting control panel**:
+Import `database.sql` into your hosted MySQL database with phpMyAdmin. For the PHP app's database credentials, choose one of these approaches:
+
+1. **Hosting environment settings (recommended):** set the variables below for the PHP website in your hosting control panel.
+2. **Private config file:** copy `connection.secrets.example.php` to `connection.secrets.php`, fill in the same values, and upload that private file to the website directory using your host's file manager. The deployment workflow deliberately excludes `connection.secrets.php`; `.gitignore` also keeps it out of Git. The `.htaccess` rule denies direct web requests to it. If both environment variables and the private file are present, environment variables take priority.
 
 | Variable | Value |
 | --- | --- |

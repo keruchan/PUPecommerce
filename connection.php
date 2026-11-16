@@ -2,37 +2,62 @@
 declare(strict_types=1);
 
 /*
- * Production: set these as environment variables in your hosting control panel.
- * Local XAMPP: the defaults below connect to the local little_things database.
+ * Production credentials can come from hosting environment variables or the
+ * private, untracked connection.secrets.php file. Local XAMPP defaults apply
+ * only when APP_ENV is not "production" and no private config is present.
  */
-$appEnvironment = getenv('APP_ENV') ?: 'local';
-$databaseVariables = ['DB_HOST', 'DB_NAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_PORT'];
-
-if ($appEnvironment === 'production') {
-    foreach ($databaseVariables as $variable) {
-        if (getenv($variable) === false) {
-            throw new RuntimeException("Missing required environment variable: {$variable}");
-        }
+$privateConfig = [];
+$privateConfigFile = __DIR__ . '/connection.secrets.php';
+if (is_file($privateConfigFile)) {
+    $loadedConfig = require $privateConfigFile;
+    if (!is_array($loadedConfig)) {
+        throw new RuntimeException('connection.secrets.php must return an array.');
     }
+    $privateConfig = $loadedConfig;
 }
 
-$dbHost = getenv('DB_HOST') ?: 'localhost';
-$dbName = getenv('DB_NAME') ?: 'u763192172_pupecommerce';
-$dbUser = getenv('DB_USERNAME') ?: 'u763192172_pupecommerce';
-$dbPass = getenv('DB_PASSWORD'); ?: 'Pupcommerce1';
-$dbPass = $dbPass === false ? '' : $dbPass;
-$dbPort = getenv('DB_PORT') ?: '3306';
-$dbCharset = 'utf8mb4';
+$readSetting = static function (string $name, ?string $default = null) use ($privateConfig): ?string {
+    $environmentValue = getenv($name);
+    if ($environmentValue !== false) {
+        return $environmentValue;
+    }
+    if (array_key_exists($name, $privateConfig)) {
+        return (string)$privateConfig[$name];
+    }
+    return $default;
+};
 
-$validatedPort = filter_var($dbPort, FILTER_VALIDATE_INT, [
+$appEnvironment = $readSetting('APP_ENV', 'local');
+$isProduction = strtolower((string)$appEnvironment) === 'production';
+$localDefaults = $isProduction ? null : [
+    'DB_HOST' => '127.0.0.1',
+    'DB_NAME' => 'little_things',
+    'DB_USERNAME' => 'root',
+    'DB_PASSWORD' => '',
+    'DB_PORT' => '3306',
+];
+
+$databaseSettings = [];
+foreach (['DB_HOST', 'DB_NAME', 'DB_USERNAME', 'DB_PASSWORD', 'DB_PORT'] as $name) {
+    $value = $readSetting($name, $localDefaults[$name] ?? null);
+    if ($value === null) {
+        throw new RuntimeException("Missing required production database setting: {$name}");
+    }
+    $databaseSettings[$name] = $value;
+}
+
+$validatedPort = filter_var($databaseSettings['DB_PORT'], FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1, 'max_range' => 65535],
 ]);
 if ($validatedPort === false) {
     throw new RuntimeException('DB_PORT must be a number from 1 to 65535.');
 }
 
-$dsn = "mysql:host={$dbHost};port={$validatedPort};dbname={$dbName};charset={$dbCharset}";
-$db = new PDO($dsn, $dbUser, $dbPass, [
+$dsn = 'mysql:host=' . $databaseSettings['DB_HOST']
+    . ';port=' . $validatedPort
+    . ';dbname=' . $databaseSettings['DB_NAME']
+    . ';charset=utf8mb4';
+$db = new PDO($dsn, $databaseSettings['DB_USERNAME'], $databaseSettings['DB_PASSWORD'], [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES => false,

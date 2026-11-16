@@ -1,4 +1,4 @@
 Options -Indexes
-<FilesMatch "^(connection\.php|database\.sql|schema\.sql|store\.sqlite)$">
+<FilesMatch "^(connection(\.secrets)?(\.example)?\.php|database\.sql|schema\.sql|store\.sqlite)$">
   Require all denied
 </FilesMatch>
